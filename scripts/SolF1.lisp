@@ -12,12 +12,13 @@
 ;(load "auxfuncs.fas")
 
 (defun isObstaclep (pos track) 
-  "check if there is an obstacle at position pos of the track"
-  t)
+  (not (nth (second pos) (nth (first pos) (track-env track) ) ) )
+)
 
 (defun isGoalp (st) 
-  "check if st is a goal state"
-  t)
+  (if (find (state-pos st) (track-endpositions (state-track st)) :test #'equal)
+ 	 t)
+)
 
 (defun nextState (st act)
   "generate the nextState after state st and action act"

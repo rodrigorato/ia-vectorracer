@@ -1,7 +1,5 @@
 ---------------------------
-	Read me dos stores
----------------------------
-
+	<b>Read me dos stores</b>
 
 Alterações na versão 0.3 (06-octubro-2016)
 
@@ -30,4 +28,4 @@ e) Correcção de typo nos parâmetros da função isgoalp.
 
 f) Correcção nos loads iniciais do ficheiro solF1.lisp
 
-
+---------------------------
