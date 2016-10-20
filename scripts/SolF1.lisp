@@ -3,13 +3,13 @@
 
 ;;; Utilizar estes includes para os testes na versao local
 ;;; comentar antes de submeter
-;(load "datastructures.lisp")
-;(load "auxfuncs.lisp")
+(load "datastructures.lisp")
+(load "auxfuncs.lisp")
 
 ;;; Utilizar estes includes para a versao a submeter
 ; tirar o comentario antes de submeter
-(load "datastructures.fas")
-(load "auxfuncs.fas")
+;(load "datastructures.fas")
+;(load "auxfuncs.fas")
 
 (defun isObstaclep (pos track) 
   (not (nth (second pos) (nth (first pos) (track-env track) ) ) )
@@ -32,19 +32,20 @@
 
 (defun nextState (st act)
   	"generate the nextState after state st and action act"
-  	(let (newState)
-  		(setf newState (make-State))
-  		(setf (STATE-VEL newState) (addListN (STATE-VEL st) act))
-  		(setf (STATE-POS newState) (addListN (STATE-POS st) (STATE-VEL newState)))
-  		(setf (STATE-ACTION newState) act)
-  		(setf (STATE-TRACK newState) (STATE-TRACK st))  		
-  		(setf (STATE-COST newState)
-  			(cond ((isObstaclep (STATE-POS newState) (STATE-TRACK newState)) 20)
-  				  ((isGoalp newState) -100)
-  				  (T 1)
-  			)
-  		)	
-  		(setf (STATE-OTHER newState) (STATE-OTHER st))
-  		newState
-  	)
- )
+  	(let (newState stVel)
+  		(setf stVel (addListN (state-vel st) act))
+
+  		(setf newState (make-STATE :VEL stVel
+	    						   :POS (addListN (state-pos st) stVel)
+	      						   :ACTION act
+	      						   :TRACK (state-track st)))
+
+	    (setf (state-cost newState) 
+	   		(cond ((isGoalp newState) -100)
+	     		  ((isObstaclep (state-pos newState) (state-track newState)) 20)
+	     	      (T 1)
+	     	)
+	    )
+	    newState
+	)
+)
