@@ -1,4 +1,4 @@
-; Grupo #xx -- Alice Dourado - 81205 -- Rodrigo Rato - 81500
+; Grupo #60 -- Alice Dourado - 81205 -- Rodrigo Rato - 81500
 
 ;;; Includes para a versao a submeter
 (load "datastructures.fas")
