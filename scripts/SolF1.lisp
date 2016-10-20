@@ -20,6 +20,16 @@
  	 t)
 )
 
+(defun addListN (l1 l2)
+	(if (= (length l1) (length l2))
+		(if (= 0 (length l1))
+			'()
+			(cons (+ (first l1) (first l2)) (addListN (rest l1) (rest l2)))
+		)
+		NIL
+	)
+)
+
 (defun nextState (st act)
   "generate the nextState after state st and action act"
   (make-STATE :POS '(3 16)
