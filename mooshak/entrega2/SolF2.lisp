@@ -1,5 +1,6 @@
 ;(load "datastructures.lisp")
 ;(load "auxfuncs.lisp")
+;
 
 (load "datastructures.fas")
 (load "auxfuncs.fas")

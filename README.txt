@@ -1,4 +1,24 @@
 
+Alterações na versão 0.6 (15-novembro-2016)
+
+Solução da 2a fase.
+
+Alterações na versão 0.5 (07-novembro-2016)
+
+Inclui scripts e testes para a 2a entrega.
+
+Correcção nos cabeçalos das funções. Retirar os parametros opcionais.
+
+Novos testes para a 2a entrega presentes no mooshak.
+
+Mooshak aberto para a 3a entrega.
+
+Alterações na versão 0.4
+
+Inclui scripts e testes para a 2a entrega.
+
+Inclui a solução da 1a entrega.
+
 Alterações na versão 0.3 (06-octubro-2016)
 
 Algumas dúvidas de alguns alunos.

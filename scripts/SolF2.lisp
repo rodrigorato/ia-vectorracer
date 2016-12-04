@@ -69,70 +69,28 @@
     (values new-state)))
 
 
-;; Solution of phase 2
-;;; Pedir
-(defun generateStates (st allActions stList)
-    (if (null allActions)
-        stList
-        (generateStates st (rest allActions) (cons (nextState st (first allActions)) stList))
-    )
-)
 
+;; Solution of phase 2
+
+;;; Pedir 
 (defun nextStates (st)
   "generate all possible next states"
-	(generateStates st (possible-actions) '())
-)
-
-
-
-(defun limDFS (noodle prob limit sol)
-    (if (funcall (problem-fn-isGoal prob) (node-state noodle))
-        sol
-        (if (= 0 limit)
-            :corte
-            (let ((result nil)
-                 (newNoodle (copy-node noodle))
-                 (cutoff nil))
-                (loop for st in (funcall (problem-fn-nextStates prob) (node-state noodle)) do
-                      
-                        (setf (node-state newNoodle) st)
-                        (setf result (limDFS newNoodle prob (1- limit) (append sol (list st))))
-                        
-                        (if (eql result :corte) (setf cutoff T)
-                            (if result (return-from limDFS result))
-                        )       
-                )      
-                        
-                (if cutoff (return-from limDFS :corte)
-                    (return-from limDFS NIL))
-            )
-        )
-    )
-)
+	(list st))
 
 ;;; limdepthfirstsearch 
 (defun limdepthfirstsearch (problem lim)
-  #| limited depth first search
+  "limited depth first search
      st - initial state
      problem - problem information
-     lim - depth limit |#
-	 (limDFS (make-node :state (problem-initial-state problem)) problem lim (list (problem-initial-state problem))) 
-)
+     lim - depth limit"
+	(list (make-node :state (problem-initial-state problem))) )
 				      
 
 ;iterlimdepthfirstsearch
 (defun iterlimdepthfirstsearch (problem)
-  #| limited depth first search
+  "limited depth first search
      st - initial state
      problem - problem information
-     lim - limit of depth iterations |#
-    (let ((result nil)
-          (lim most-positive-fixnum))
-        (loop for i from 0 to lim do
-            (setf result (limdepthfirstsearch problem i))
-            (if (not (or (eq result :corte) (null result)))
-                (return-from iterlimdepthfirstsearch result))  
-        )
-    )
-    NIL
-)
+     lim - limit of depth iterations"
+	(list (make-node :state (problem-initial-state problem))) )
+
