@@ -158,4 +158,16 @@
 	    
 ;;; A*
 (defun a* (problem)
-  (list (make-node :state (problem-initial-state problem))))
+  (let ( (closedSet (list))  (cameFrom (list)) 
+         (openSet (list (make-node :state (problem-initial-state problem)
+                                   :g 0
+                                   :h (compute-heuristic (problem-initial-state problem))
+                                   :f (compute-heuristic (problem-initial-state problem))))))
+    
+    (loop while openSet do
+      ;;ver qual o gajo com menor f , e ver se é endposition
+      
+      
+    )
+  )
+)
