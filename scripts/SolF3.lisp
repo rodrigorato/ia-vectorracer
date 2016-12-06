@@ -184,10 +184,20 @@
          (openSet (list (make-node :state (problem-initial-state problem)
                                    :g 0
                                    :h (compute-heuristic (problem-initial-state problem))
-                                   :f (compute-heuristic (problem-initial-state problem))))))
+                                   :f (compute-heuristic (problem-initial-state problem)))))
+         (currentNode nil))
+    
     
     (loop while openSet do
-      ;;ver qual o gajo com menor f , e ver se é endposition
+      (setf currentNode (minNodeF openSet))
+      (if (member (state-pos (node-state currentNode))  
+                  (track-endpositions (state-track (node-state currentNode)))  )
+          (return (buildPath cameFrom currentNode));;usa-se return?
+      )
+      (remove currentNode openSet)
+      (cons currentNode closedSet)
+      (loop(nextStates (node currentNode))
+      
       
       
     )
