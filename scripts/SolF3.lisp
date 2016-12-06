@@ -94,7 +94,7 @@
   #|limited depth first search
      st - initial state
      problem - problem information
-     lim - depth limit"|#
+     lim - depth limit|#
   (labels ((limdepthfirstsearch-aux (node problem lim)
        (if (isGoalp (node-state node))
      (solution node)
@@ -123,7 +123,7 @@
   #|limited depth first search
      st - initial state
      problem - problem information
-     lim - limit of depth iterations"|#
+     lim - limit of depth iterations|#
   (let ((i 0))
     (loop
       (let ((res (limdepthfirstsearch problem i :cutoff? T)))
@@ -155,7 +155,17 @@
   )
 )
   
-	    
+(defun minNodeF (nodeList)
+  (let ((nodeMinF (first nodeList)))
+    (loop for n in nodeList do
+      (if (< (node-f n) (node-f nodeMinF))
+        (setf nodeMinF n)
+      )
+    )
+    nodeMinF
+  )
+)
+  
 ;;; A*
 (defun a* (problem)
   (let ( (closedSet (list))  (cameFrom (list)) 
