@@ -178,6 +178,25 @@
   (buildPathAux n (list)
 )
   
+(defun stateMember (st nodeList)
+  (let ((tempvar NIL))
+    (loop for n in nodeList do
+      (if (and (= (state-pos st) (state-pos (node-state n)))
+               (= (state-vel st) (state-vel (node-state n)))
+               (= (state-action st) (state-action (node-state n)))
+               (= (state-cost st) (state-cost (node-state n)))
+               (= (state-track st) (state-track (node-state n)))
+               (= (state-other st) (state-other (node-state n)))        
+          )
+        (setf tempvar n)
+      )
+    )
+    tempvar
+  )
+)
+
+
+
 ;;; A*
 (defun a* (problem)
   (let ( (closedSet (list))  (cameFrom (list)) 
