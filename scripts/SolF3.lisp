@@ -198,15 +198,13 @@
 
 
 ;;; A*
-(defun a* (problem)
+(defun a* (problem);;replace compute-heuristic with funcal porblem-fn-h
   (let ( (closedSet (list))  (cameFrom (list)) 
          (openSet (list (make-node :state (problem-initial-state problem)
                                    :g 0
                                    :h (compute-heuristic (problem-initial-state problem))
                                    :f (compute-heuristic (problem-initial-state problem)))))
-         (currentNode nil))
-    
-    
+         (currentNode nil) (tempG nil) (tempNode nil))    
     (loop while openSet do
       (setf currentNode (minNodeF openSet))
       (if (member (state-pos (node-state currentNode))  
@@ -216,10 +214,23 @@
       (remove currentNode openSet)
       (cons currentNode closedSet)
       (loop for st in (nextStates (node-state currentNode)) do
-        (if ()
+        (if (not (stateMember st closedSet))
+          (setf tempG (+ (node-g currentNode) (state-cost st) ))
+          (if (not (stateMember st openSet))
+            (setf openSet (cons (setf tempNode (make-node :state st 
+                                            :parent currentNode
+                                            :h (compute-heuristic (problem-initial-state problem))) )
+                          openSet))
+            #|(if (< tempG (node-g (stateMember st openSet)))
+              ((setf cameFrom (cons currentNode cameFrom))
+               (setf (node-g tempNode) tempG)
+               (setf (node-f tempNode))
+              )|#
+            )
+          )
+          
+            
         )
-      
-      
       )     
     )
   )
