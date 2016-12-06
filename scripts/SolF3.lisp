@@ -165,6 +165,18 @@
     nodeMinF
   )
 )
+
+(defun buildPathAux (n path)
+  (if (null n)
+    path
+    (buildPathAux (node-parent n) (append path (list (node-state n))))
+  )
+)
+
+
+(defun buildPath (n)
+  (buildPathAux n (list)
+)
   
 ;;; A*
 (defun a* (problem)
