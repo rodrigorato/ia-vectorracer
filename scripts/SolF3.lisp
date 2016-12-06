@@ -215,10 +215,12 @@
       )
       (remove currentNode openSet)
       (cons currentNode closedSet)
-      (loop(nextStates (node currentNode))
+      (loop for st in (nextStates (node-state currentNode)) do
+        (if ()
+        )
       
       
-      
+      )     
     )
   )
 )
