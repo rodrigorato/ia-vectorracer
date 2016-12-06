@@ -225,8 +225,8 @@
               ((setf cameFrom (cons currentNode cameFrom))
                (setf (node-g tempNode) tempG)
                (setf (node-f tempNode))
-              )|#
-            )
+              )
+            )|#
           )
           
             
