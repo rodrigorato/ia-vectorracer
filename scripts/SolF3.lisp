@@ -211,28 +211,31 @@
                   (track-endpositions (state-track (node-state currentNode)))  )
           (return (buildPath currentNode));;usa-se return?
       )
-      (remove currentNode openSet)
-      (cons currentNode closedSet)
+      (setf openSet (remove currentNode openSet))
+      (setf closedSet (cons currentNode closedSet))
       (loop for st in (nextStates (node-state currentNode)) do
         (if (not (stateMember st closedSet))
-          (progn (setf tempG (+ (node-g currentNode) (state-cost st) ))
-          (if (not (stateMember st openSet))
-            (setf openSet 
-              (cons (setf tempNode 
+          (progn 
+            (setf tempG (+ (node-g currentNode) (state-cost st) ))
+            (if (not (stateMember st openSet))
+              (setf openSet 
+                (cons (setf tempNode 
                           (make-node :state st 
                                      :parent currentNode
                                      :h (compute-heuristic (problem-initial-state problem))
                                      :g most-positive-fixnum))
-              openSet))
+                openSet))
+            )
+            (if (< tempG (node-g (stateMember st openSet)))
+              (progn ;;(setf cameFrom (cons currentNode cameFrom))
+                (setf openSet (remove tempNode openSet))
+                (setf (node-g tempNode) tempG)
+                (setf (node-f tempNode) (+ tempG (node-h tempNode)))
+                (setf openSet (cons tempNode openSet))
+              )                    
+            )
           )
-          (if (< tempG (node-g (stateMember st openSet)))
-            (progn ;;(setf cameFrom (cons currentNode cameFrom))
-            (remove tempNode openSet)
-            (setf (node-g tempNode) tempG)
-            (setf (node-f tempNode) (+ tempG (node-h tempNode)))
-            (setf openSet (cons tempNode openSet)))                    
-          )
-        ))
+        )
       )     
     )
   )
