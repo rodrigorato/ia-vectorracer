@@ -178,7 +178,7 @@
   (buildPathAux n (list))
 )
   
-(defun stateMember (st nodeList);possivelmente nao é pa comparar tudo
+(defun stateMember (st nodeList)
   (let ((tempvar NIL))
     (loop for n in nodeList do
       (if (and (equal (state-pos st) (state-pos (node-state n)))
