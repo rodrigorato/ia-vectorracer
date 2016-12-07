@@ -169,7 +169,7 @@
 (defun buildPathAux (n path)
   (if (null n)
     path
-    (buildPathAux (node-parent n) (append path (list (node-state n))))
+    (buildPathAux (node-parent n) (append  (list (node-state n)) path))
   )
 )
 
@@ -183,10 +183,10 @@
     (loop for n in nodeList do
       (if (and (equal (state-pos st) (state-pos (node-state n)))
                (equal (state-vel st) (state-vel (node-state n)))
-               (equal (state-action st) (state-action (node-state n)))
-               (equal (state-cost st) (state-cost (node-state n)))
-               (equal (state-track st) (state-track (node-state n)))
-               (equal (state-other st) (state-other (node-state n)))        
+               ;(equal (state-action st) (state-action (node-state n)))
+               ;(equal (state-cost st) (state-cost (node-state n)))
+               ;(equal (state-track st) (state-track (node-state n)))
+               ;(equal (state-other st) (state-other (node-state n)))        
           )
         (setf tempvar n)
       )
@@ -198,22 +198,21 @@
 
 
 ;;; A*
-(defun a* (problem);;replace compute-heuristic with funcal porblem-fn-h
-  (let ( (closedSet (list))  ;(cameFrom (list)) 
+(defun a* (problem);;replace compute-heuristic with funcal problem-fn-h
+  (let ( (closedSet (list))  
          (openSet (list (make-node :state (problem-initial-state problem)
                                    :g 0
-                                   :h (compute-heuristic (problem-initial-state problem))
-                                   :f (compute-heuristic (problem-initial-state problem)))))
+                                   :h (funcall (problem-fn-h problem) (problem-initial-state problem)) )))
          (currentNode nil) (tempG nil) (tempNode nil))    
+    (setf (node-f (first openSet)) (node-h (first openSet)))
     (loop while openSet do
       (setf currentNode (minNodeF openSet))
-      (if (member (state-pos (node-state currentNode))  
-                  (track-endpositions (state-track (node-state currentNode)))  )
+      (if (funcall (problem-fn-isGoal problem) (node-state currentNode))
           (return (buildPath currentNode));;usa-se return?
       )
       (setf openSet (remove currentNode openSet))
       (setf closedSet (cons currentNode closedSet))
-      (loop for st in (nextStates (node-state currentNode)) do
+      (loop for st in (funcall (problem-fn-nextStates problem) (node-state currentNode)) do
         (if (not (stateMember st closedSet))
           (progn 
             (setf tempG (+ (node-g currentNode) (state-cost st) ))
@@ -222,7 +221,7 @@
                 (cons (setf tempNode 
                           (make-node :state st 
                                      :parent currentNode
-                                     :h (compute-heuristic (problem-initial-state problem))
+                                     :h (funcall (problem-fn-h problem) st)
                                      :g most-positive-fixnum))
                 openSet))
             )
