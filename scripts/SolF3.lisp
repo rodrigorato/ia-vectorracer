@@ -178,15 +178,15 @@
   (buildPathAux n (list))
 )
   
-(defun stateMember (st nodeList)
+(defun stateMember (st nodeList);possivelmente nao é pa comparar tudo
   (let ((tempvar NIL))
     (loop for n in nodeList do
-      (if (and (= (state-pos st) (state-pos (node-state n)))
-               (= (state-vel st) (state-vel (node-state n)))
-               (= (state-action st) (state-action (node-state n)))
-               (= (state-cost st) (state-cost (node-state n)))
-               (= (state-track st) (state-track (node-state n)))
-               (= (state-other st) (state-other (node-state n)))        
+      (if (and (equal (state-pos st) (state-pos (node-state n)))
+               (equal (state-vel st) (state-vel (node-state n)))
+               (equal (state-action st) (state-action (node-state n)))
+               (equal (state-cost st) (state-cost (node-state n)))
+               (equal (state-track st) (state-track (node-state n)))
+               (equal (state-other st) (state-other (node-state n)))        
           )
         (setf tempvar n)
       )
