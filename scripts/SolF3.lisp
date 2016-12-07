@@ -175,7 +175,7 @@
 
 
 (defun buildPath (n)
-  (buildPathAux n (list)
+  (buildPathAux n (list))
 )
   
 (defun stateMember (st nodeList)
@@ -199,7 +199,7 @@
 
 ;;; A*
 (defun a* (problem);;replace compute-heuristic with funcal porblem-fn-h
-  (let ( (closedSet (list))  (cameFrom (list)) 
+  (let ( (closedSet (list))  ;(cameFrom (list)) 
          (openSet (list (make-node :state (problem-initial-state problem)
                                    :g 0
                                    :h (compute-heuristic (problem-initial-state problem))
@@ -209,28 +209,30 @@
       (setf currentNode (minNodeF openSet))
       (if (member (state-pos (node-state currentNode))  
                   (track-endpositions (state-track (node-state currentNode)))  )
-          (return (buildPath cameFrom currentNode));;usa-se return?
+          (return (buildPath currentNode));;usa-se return?
       )
       (remove currentNode openSet)
       (cons currentNode closedSet)
       (loop for st in (nextStates (node-state currentNode)) do
         (if (not (stateMember st closedSet))
-          (setf tempG (+ (node-g currentNode) (state-cost st) ))
+          (progn (setf tempG (+ (node-g currentNode) (state-cost st) ))
           (if (not (stateMember st openSet))
-            (setf openSet (cons (setf tempNode (make-node :state st 
-                                            :parent currentNode
-                                            :h (compute-heuristic (problem-initial-state problem))) )
-                          openSet))
-            #|(if (< tempG (node-g (stateMember st openSet)))
-              ((setf cameFrom (cons currentNode cameFrom))
-               (setf (node-g tempNode) tempG)
-               (setf (node-f tempNode))
-              )
-            )|#
+            (setf openSet 
+              (cons (setf tempNode 
+                          (make-node :state st 
+                                     :parent currentNode
+                                     :h (compute-heuristic (problem-initial-state problem))
+                                     :g most-positive-fixnum))
+              openSet))
           )
-          
-            
-        )
+          (if (< tempG (node-g (stateMember st openSet)))
+            (progn ;;(setf cameFrom (cons currentNode cameFrom))
+            (remove tempNode openSet)
+            (setf (node-g tempNode) tempG)
+            (setf (node-f tempNode) (+ tempG (node-h tempNode)))
+            (setf openSet (cons tempNode openSet)))                    
+          )
+        ))
       )     
     )
   )
