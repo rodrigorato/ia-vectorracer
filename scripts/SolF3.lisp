@@ -140,8 +140,13 @@
   (list (- (first pair1) (first pair2)) (- (second pair1) (second pair2)))
 )
 
+
 (defun compute-heuristic (st)
  (let ( (track1 (state-track st)) (temp nil) (minDistance (list most-positive-fixnum  most-positive-fixnum)))
+    (if (isObstaclep (state-pos st) track1)
+      (return most-positive-fixnum)
+    )
+
     (loop for end in (track-endpositions track1) do
       (setf temp (subPair end (state-pos st)))
       (if (< (first temp) (first minDistance))
@@ -155,20 +160,6 @@
   )
 )
 
-#|
-
-;; https://github.com/aimacode/aima-python/blob/master/search.py
-
-(defun compute-heuristic (st)
-  (let ((track1 (state-track st))
-        (temp NIL)
-        (minDistance (list most-positive-fixnum most-positive-fixnum))
-       )
-
-
-  )
-)
-#|
   
 (defun minNodeF (nodeList)
   (let ((nodeMinF (first nodeList)))
@@ -254,4 +245,14 @@
       )     
     )
   )
+)
+
+
+
+(defun best-search (problem)
+    (let ((heuristicTable NIL)
+         )
+      (setf heuristicTable (calcHeuristic (problem-track problem)))
+
+    )
 )

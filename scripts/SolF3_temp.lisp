@@ -140,8 +140,14 @@
   (list (- (first pair1) (first pair2)) (- (second pair1) (second pair2)))
 )
 
+
+#|
 (defun compute-heuristic (st)
  (let ( (track1 (state-track st)) (temp nil) (minDistance (list most-positive-fixnum  most-positive-fixnum)))
+    (if (isObstaclep (state-pos st) track1)
+      (return most-positive-fixnum)
+    )
+
     (loop for end in (track-endpositions track1) do
       (setf temp (subPair end (state-pos st)))
       (if (< (first temp) (first minDistance))
@@ -154,6 +160,82 @@
     (max (first minDistance) (second minDistance))
   )
 )
+|#
+
+(defun compute-heuristic (st)
+  (let ((endPositions (track-endpositions (state-track st)))
+        (queue (list)) (actions (possible-actions)) (current nil) (temp_state nil)
+       )
+
+    (if (isObstaclep (state-pos st) (state-track st))
+      (return most-positive-fixnum)
+    )
+    
+    (loop for endPos in endPositions do
+      (push (make-state :pos endPos :other 0) queue)
+    )
+
+    (setf actions (remove '(0 0) actions))
+
+    (loop while queue do
+      (setf current (pop queue))
+      (write current) (terpri)
+
+      (dolist (mov actions)
+
+        (setf temp_state (make-state :pos (list (+ (pos-l (state-pos current)) (acce-l mov)) (+ (pos-c (state-pos current)) (acce-c mov))) 
+                                     :other (+ (state-other current) 1)))
+
+        (if (equal (state-pos st) (state-pos temp_state))
+          (return (state-other temp_state))
+        )
+
+         (if (not (isObstaclep (state-pos st) (state-track st)))
+
+        (if (not (member temp_state queue :test #'compare))
+          (setf queue (append queue (list temp_state)))
+          (if (< (state-other temp_state) (state-other (first (member temp_state queue :test #'compare))))
+            (setf (node-other (nth (position (first (member temp_state openSet #'compare)) queue) queue)) (state-other temp_state))
+          )
+        )
+
+        )
+      )
+    )
+  )
+)
+
+(defun compare (a b)
+  (equal (state-pos a) (state-pos b))
+)
+
+
+#|
+
+Breadth-First-Search(Graph, root):
+    
+    for each node n in Graph:            
+        n.distance = INFINITY        
+        n.parent = NIL
+
+    create empty queue Q      
+
+    root.distance = 0
+    Q.enqueue(root)                      
+
+    while Q is not empty:        
+        current = Q.dequeue()
+        for each node n that is adjacent to current:
+            if n.distance == INFINITY:
+                n.distance = current.distance + 1
+                n.parent = current
+                Q.enqueue(n)
+
+
+|#
+
+;; https://github.com/aimacode/aima-python/blob/master/search.py
+
   
 (defun minNodeF (nodeList)
   (let ((nodeMinF (first nodeList)))
@@ -169,7 +251,7 @@
 (defun buildPathAux (n path)
   (if (null n)
     path
-    (buildPathAux (node-parent n) (append path (list (node-state n))))
+    (buildPathAux (node-parent n) (append  (list (node-state n)) path))
   )
 )
 
@@ -178,15 +260,11 @@
   (buildPathAux n (list))
 )
   
-(defun stateMember (st nodeList);possivelmente nao é pa comparar tudo
+(defun stateMember (st nodeList)
   (let ((tempvar NIL))
     (loop for n in nodeList do
       (if (and (equal (state-pos st) (state-pos (node-state n)))
-               (equal (state-vel st) (state-vel (node-state n)))
-               ;(equal (state-action st) (state-action (node-state n)))
-               ;(equal (state-cost st) (state-cost (node-state n)))
-               ;(equal (state-track st) (state-track (node-state n)))
-               ;(equal (state-other st) (state-other (node-state n)))        
+               (equal (state-vel st) (state-vel (node-state n)))      
           )
         (setf tempvar n)
       )
@@ -196,116 +274,53 @@
 )
 
 
+
 ;;; A*
-
 (defun a* (problem)
-  (let ((closedSet (list))
+  (let ((closedSet (list))  
         (openSet (list (make-node :state (problem-initial-state problem)
-                            :parent NIL
-                            :f (funcall (problem-fn-h problem) (problem-initial-state problem)) ;optimizar as duas chamadas?
-                            :g 0
-                            :h (funcall (problem-fn-h problem) (problem-initial-state problem)))))
-        (current NIL)
-        (neighborsOfCurrent (list))
-        (temp_node NIL)
-        (temp_gScore 0) ; maybe shouldn't start at 0
-        )
-    (loop while openSet do
-      (setf current (minNodeF openSet))
-      (if (funcall (problem-fn-isGoal problem) (node-state current))
-        (return (buildPath current))
-      )
+                                  :g 0
+                                  :h (funcall (problem-fn-h problem) (problem-initial-state problem)) )))
+         (currentNode nil) 
+         (tempG nil) 
+         (tempNode nil)
+        )   
+    (setf (node-f (first openSet)) (node-h (first openSet)))
 
-      (setf openSet (remove current openSet))
-      (setf closedSet (cons current closedSet))
-
-      (setf neighborsOfCurrent (funcall (problem-fn-nextStates problem) (node-state current)))
-
-      (loop for neighbor in neighborsOfCurrent do 
-        (block continue
-          (setf temp_node (stateMember neighbor closedSet))
-          (if (null temp_node)  
-            (return-from continue)
-          )
-
-          (setf temp_gScore (+ (node-g temp_node) (state-cost (node-state temp_node))))
-
-          (if (not (stateMember neighbor openSet))
-            (setf openSet (cons temp_node openSet))
-            (if (>= temp_gScore (node-g temp_node))
-              (return-from continue)
-            )
-          )
-
-          (setf (node-g temp_node) temp_gScore)
-          (setf (node-f temp_node) (+ (node-g temp_node) (funcall (problem-fn-h problem) (node-state temp_node))))
-
-        )
-      )
-    )
-  )
-)
-#|
-;transcrito da wikipedia com mismatched parentesis somewhere
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-(defun a* (problem);;replace compute-heuristic with funcal porblem-fn-h
-  (let ( (closedSet (list))  ;(cameFrom (list)) 
-         (openSet (list (make-node :state (problem-initial-state problem)
-                                   :g 0
-                                   :h (compute-heuristic (problem-initial-state problem))
-                                   :f (compute-heuristic (problem-initial-state problem)))))
-         (currentNode nil) (tempG nil) (tempNode nil))    
     (loop while openSet do
       (setf currentNode (minNodeF openSet))
-      (if (member (state-pos (node-state currentNode))  
-                  (track-endpositions (state-track (node-state currentNode)))  )
-          (return (buildPath currentNode));;usa-se return?
+      (if (funcall (problem-fn-isGoal problem) (node-state currentNode))
+          (return (buildPath currentNode))
       )
-      (remove currentNode openSet)
-      (cons currentNode closedSet)
-      (loop for st in (nextStates (node-state currentNode)) do
+
+      (setf openSet (remove currentNode openSet))
+      (setf closedSet (cons currentNode closedSet))
+      (loop for st in (funcall (problem-fn-nextStates problem) (node-state currentNode)) do
         (if (not (stateMember st closedSet))
-          (progn (setf tempG (+ (node-g currentNode) (state-cost st) ))
-          (if (not (stateMember st openSet))
-            (setf openSet 
-              (cons (setf tempNode 
+          (progn 
+            (setf tempG (+ (node-g currentNode) (state-cost st) ))
+            (if (not (stateMember st openSet))
+              (setf openSet 
+                (cons (setf tempNode 
                           (make-node :state st 
                                      :parent currentNode
-                                     :h (compute-heuristic (problem-initial-state problem))
+                                     :h (funcall (problem-fn-h problem) st)
                                      :g most-positive-fixnum))
-              openSet))
+                openSet))
+            )
+            (if (< tempG (node-g (stateMember st openSet)))
+              (progn
+                (setf openSet (remove tempNode openSet))
+                (setf (node-g tempNode) tempG)
+                (setf (node-f tempNode) (+ tempG (node-h tempNode)))
+                (setf openSet (cons tempNode openSet))
+              )                    
+            )
           )
-          (if (< tempG (node-g (stateMember st openSet)))
-            (progn ;;(setf cameFrom (cons currentNode cameFrom))
-            (remove tempNode openSet)
-              (setf (node-g tempNode) tempG)
-            (setf (node-f tempNode) (+ tempG (node-h tempNode)))
-            (setf openSet (cons tempNode openSet)))                    
-          )
-        ))
+        )
       )     
     )
   )
 )
 
-|#
+
