@@ -144,19 +144,20 @@
 (defun compute-heuristic (st)
  (let ( (track1 (state-track st)) (temp nil) (minDistance (list most-positive-fixnum  most-positive-fixnum)))
     (if (isObstaclep (state-pos st) track1)
-      (return most-positive-fixnum)
-    )
-
-    (loop for end in (track-endpositions track1) do
-      (setf temp (subPair end (state-pos st)))
-      (if (< (first temp) (first minDistance))
-          (setf (first minDistance) (first temp))
+      most-positive-fixnum
+      (progn
+        (loop for end in (track-endpositions track1) do
+          (setf temp (subPair end (state-pos st)))
+          (if (< (first temp) (first minDistance))
+              (setf (first minDistance) (first temp))
+          )
+          (if (< (second temp) (second minDistance))
+           (setf (second minDistance) (second temp))
+          )
+        )
+        (max (first minDistance) (second minDistance))
       )
-      (if (< (second temp) (second minDistance))
-        (setf (second minDistance) (second temp))
-      )
     )
-    (max (first minDistance) (second minDistance))
   )
 )
 
@@ -250,9 +251,48 @@
 
 
 (defun best-search (problem)
-    (let ((heuristicTable NIL)
-         )
-      (setf heuristicTable (calcHeuristic (problem-track problem)))
+  (let ((closedSet (list))  
+        (openSet (list (make-node :state (problem-initial-state problem)
+                                  :g 0
+                                  :h (funcall (problem-fn-h problem) (problem-initial-state problem)) )))
+         (currentNode nil) 
+         (tempG nil) 
+         (tempNode nil)
+        )   
+    (setf (node-f (first openSet)) (node-h (first openSet)))
 
+    (loop while openSet do
+      (setf currentNode (minNodeF openSet))
+      (if (funcall (problem-fn-isGoal problem) (node-state currentNode))
+          (return (buildPath currentNode))
+      )
+
+      (setf openSet (remove currentNode openSet))
+      (setf closedSet (cons currentNode closedSet))
+      (loop for st in (funcall (problem-fn-nextStates problem) (node-state currentNode)) do
+        (if (not (stateMember st closedSet))
+          (progn 
+            (setf tempG (+ (node-g currentNode) (state-cost st) ))
+            (if (not (stateMember st openSet))
+              (setf openSet 
+                (cons (setf tempNode 
+                          (make-node :state st 
+                                     :parent currentNode
+                                     :h (funcall (problem-fn-h problem) st)
+                                     :g most-positive-fixnum))
+                openSet))
+            )
+            (if (< tempG (node-g (stateMember st openSet)))
+              (progn
+                (setf openSet (remove tempNode openSet))
+                (setf (node-g tempNode) tempG)
+                (setf (node-f tempNode) (+ tempG (node-h tempNode)))
+                (setf openSet (cons tempNode openSet))
+              )                    
+            )
+          )
+        )
+      )     
     )
+  )
 )
